@@ -12,6 +12,31 @@
     animation: App-logo-spin infinite 20s linear;
   }
 }
+.legend {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: nowrap;
+  justify-content: flex-start;
+  align-items: center;
+  margin-top: 10px;
+}
+
+.legend-item {
+  display: flex;
+  align-items: center;
+  margin-right: 20px;
+}
+
+.legend-color {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  margin-right: 5px;
+}
+.metric-container {
+  overflow-y: auto;
+}
+
 
 .App-header {
   background-color: #282c34;
@@ -23,7 +48,10 @@
   font-size: calc(10px + 2vmin);
   color: white;
 }
-
+.react-grid-item:hover {
+  z-index: 1000;
+  position: relative;
+}
 .App-link {
   color: #61dafb;
 }
@@ -36,7 +64,11 @@
     transform: rotate(360deg);
   }
 }
-.draggable-widget {
+.metric-container {
+  overflow-y: auto;
+}
+
+.draggable-widget { 
   width: 100%;
   height: 100%;
 }
@@ -56,4 +88,12 @@
       #fff 1px,
       #fff 100%
     );
+}
+
+.react-resizable-handle  {
+  z-index: 1000; /* Adjust this value to a suitable number */
+  position:relative;
+}
+.react-grid-item > .react-resizable-handle {
+  z-index: 1000; /* Set a high z-index value */
 }

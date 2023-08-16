@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import * as d3 from 'd3';
 import { transformDataForD3 } from './DataController';
 
@@ -9,13 +9,36 @@ type DataType = {
 };
 
 interface SummaryComponentProps {
-    viewType: 'unique_view' | 'page_view'; // viewType만 props로 남깁니다.
+    viewType: 'unique_view' | 'page_view';
 }
 
-const fixedUrl = "https://static.adbrix.io/front/coding-test/event_1.json"; // 고정된 url 값
+interface MetricChartProps {
+    title: string;
+    value: number;
+    description: string;
+}
+const fixedUrl = "https://static.adbrix.io/front/coding-test/event_1.json";
 
 const SummaryComponent: React.FC<SummaryComponentProps> = ({ viewType }) => {
     const ref = useRef<HTMLDivElement | null>(null);
+    const [dimensions, setDimensions] = useState({ width: 0, height: 0 });
+
+    const updateDimensions = () => {
+        if (ref.current) {
+            setDimensions({
+                width: ref.current.offsetWidth,
+                height: ref.current.offsetHeight,
+            });
+        }
+    };
+
+    useEffect(() => {
+        updateDimensions();
+        window.addEventListener("resize", updateDimensions);
+        return () => {
+            window.removeEventListener("resize", updateDimensions);
+        };
+    }, []);
 
     useEffect(() => {
         d3.json<DataType[]>(fixedUrl).then(res => {
@@ -35,11 +58,11 @@ const SummaryComponent: React.FC<SummaryComponentProps> = ({ viewType }) => {
 
                     d3.select(ref.current)
                         .append('p')
-                        .text(`View Difference (Today vs Yesterday): ${viewDifference}`);
+                        .html(` <span style="color: red;">&darr; ${viewDifference}</span>`);
                 }
             }
         });
-    }, [viewType]);
+    }, [viewType, dimensions.width, dimensions.height]);
 
     return <div ref={ref}></div>
 }

@@ -2,19 +2,16 @@ import React , { ReactNode } from 'react';
 import { useDrag } from 'react-dnd';
 import { Box } from '@chakra-ui/react';
 
-
 const type = 'DRAGGABLE_ITEM';
 
 interface DraggableWidgetProps {
-  initialWidth?: number;
-  initialHeight?: number;
+  title: string; // title prop을 추가합니다.
   component: ReactNode; // 여기서 component라는 prop을 추가합니다.
 }
 
 const DraggableWidget: React.FC<DraggableWidgetProps> = ({
-  component, 
-  initialWidth = 200,
-  initialHeight = 200
+  title, // title prop을 받아옵니다.
+  component,
 }) => {
   const [, ref] = useDrag({
     type: type,
@@ -30,8 +27,12 @@ const DraggableWidget: React.FC<DraggableWidgetProps> = ({
       padding="20px"
       boxSizing="border-box"
     > 
-    {component}
-
+      <div className="draggable-widget-title">
+        <h3>{title}</h3> {/* title prop의 값을 위젯의 제목으로 표시합니다. */}
+      </div>
+      <div className="draggable-widget">
+        {component}
+      </div>
     </Box>
   )
 }

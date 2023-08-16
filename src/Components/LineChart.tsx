@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import * as d3 from 'd3';
 import { transformRawDataToDataSet } from './DataController';
 
@@ -11,61 +11,86 @@ interface DataPoint {
 type DataSet = DataPoint[];
 
 interface ChartProps {
-    width?: number;
-    height?: number;
     margin?: { top: number, right: number, bottom: number, left: number };
 }
 
-const TrendChart: React.FC<ChartProps> = ({ 
-    width = 600, 
-    height = 400, 
-    margin = { top: 20, right: 20, bottom: 50, left: 50 } // 여기에 margin을 추가했습니다.
+const TrendChart: React.FC<ChartProps> = ({
+    margin = { top: 20, right: 20, bottom: 50, left: 50 }
 }) => {
     const ref = useRef<SVGSVGElement | null>(null);
+    const containerRef = useRef<HTMLDivElement | null>(null);
+
+    const [width, setWidth] = useState(0);
+    const [height, setHeight] = useState(0);
+
+    useEffect(() => {
+        const resizeObserver = new ResizeObserver(() => {
+            if (containerRef.current) {
+                setWidth(containerRef.current.offsetWidth);
+                setHeight(containerRef.current.offsetHeight);
+            }
+        });
+
+        if (containerRef.current) {
+            resizeObserver.observe(containerRef.current);
+        }
+
+        return () => {
+            resizeObserver.disconnect();
+        };
+    }, []);
 
     useEffect(() => {
         if (ref.current) {
             d3.json("https://static.adbrix.io/front/coding-test/event_1.json")
                 .then((response: any) => {
                     d3.select(ref.current).selectAll("*").remove();
-    
+
                     const data: DataSet = transformRawDataToDataSet(response);
-    
+
                     const svg = d3.select(ref.current)
-                                  .append('g')
-                                  .attr('transform', `translate(${margin.left}, ${margin.top})`);
-    
+                        .append('g')
+                        .attr('transform', `translate(${margin.left}, ${margin.top})`);
+
                     const xScale = d3.scaleTime()
                         .domain(d3.extent(data, d => d.date) as [Date, Date])
                         .range([0, width - margin.left - margin.right]);
-    
-                        const yScaleLine = d3.scaleLinear()
-                        .domain([0, d3.max(data, d => d.page_view) as number])
-                        .range([height - margin.top - margin.bottom - 200, 500]);
-                    
-                    // For the bar chart
+
+                    const yScaleLine = d3.scaleLinear()
+                        .domain([0, d3.max(data, d => d.unique_view) as number])
+                        .range([height - margin.top - margin.bottom, 0]);
+
                     const yScaleBar = d3.scaleLinear()
                         .domain([0, d3.max(data, d => d.page_view) as number])
                         .range([height - margin.top - margin.bottom, 0]);
-    
+
                     const xAxis = d3.axisBottom(xScale);
-    
+
+                    const yAxisLeft = d3.axisLeft(yScaleLine);
+                    const yAxisRight = d3.axisRight(yScaleBar);
+
                     svg.append("g")
                         .attr("transform", `translate(0, ${height - margin.top - margin.bottom})`)
                         .call(xAxis);
-    
+
+                    svg.append("g")
+                        .call(yAxisLeft);
+
+                    svg.append("g")
+                        .attr("transform", `translate(${width - margin.right - margin.left},0)`)
+                        .call(yAxisRight);
+
                     const line = d3.line<DataPoint>()
                         .x(d => xScale(d.date))
                         .y(d => yScaleLine(d.unique_view));
-    
+
                     svg.append("path")
                         .datum(data)
                         .attr("fill", "none")
                         .attr("stroke", "blue")
                         .attr("stroke-width", 0.5)
                         .attr("d", line);
-    
-                    // Uncomment this if you want to add the bars back
+
                     svg.selectAll(".bar")
                         .data(data)
                         .enter().append("rect")
@@ -73,14 +98,18 @@ const TrendChart: React.FC<ChartProps> = ({
                         .attr("x", d => xScale(d.date) as number)
                         .attr("y", d => yScaleBar(d.page_view) as number)
                         .attr("width", 5)
-                        .attr("height", d => height - margin.top - margin.bottom - (yScaleBar(d.page_view) as number))
+                        .attr("height", d => Math.max(0, height - margin.top - margin.bottom - (yScaleBar(d.page_view) as number)))
                         .attr("fill", "red");
-                    
+
                 });
         }
     }, [width, height, margin]);
 
-    return <svg ref={ref} width={width} height={height}></svg>;
+    return (
+        <div ref={containerRef} style={{ width: '100%', height: '100%' }}>
+            <svg ref={ref} width={width} height={height}></svg>
+        </div>
+    );
 };
 
 export default TrendChart;

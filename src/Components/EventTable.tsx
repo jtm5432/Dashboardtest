@@ -1,10 +1,19 @@
 import { useState } from 'react';
 
+
 interface TableProps {
     data: (string | number)[][];
+    style?: React.CSSProperties;
+    columnWidths?: number[];  // Add this prop for column widths
 }
-
-const EventTable: React.FC<TableProps> = ({ data }) => {
+    
+const getValue = (value: any) => {
+    if (value === null || value === undefined || value.length === 0) {
+        return 'etc';
+    }
+    return value;
+};
+const EventTable: React.FC<TableProps> = ({ data, style, columnWidths }) => {
     const [expandedCountries, setExpandedCountries] = useState<Set<string>>(new Set());
     const [expandedRegions, setExpandedRegions] = useState<Set<string>>(new Set());
     const [sortAscending, setSortAscending] = useState(false);
@@ -39,10 +48,11 @@ const EventTable: React.FC<TableProps> = ({ data }) => {
     };
 
     const countryData = data.reduce((acc: any, item) => {
-        const country = item[0] as string;
-        const region = item[1] as string;
-        const city = item[2] as string;
+        const country = getValue(item[0]) as string;
+        const region = getValue(item[1]) as string;
+        const city = getValue(item[2]) as string;
         const count = item[3] as number;
+
         if (!acc[country]) acc[country] = {};
         if (!acc[country][region]) acc[country][region] = [];
         acc[country][region].push({ city, count });
@@ -61,16 +71,16 @@ const EventTable: React.FC<TableProps> = ({ data }) => {
     });
 
     return (
-        <div style={{ overflowY: 'auto', maxHeight: '400px' }}>
-            <table>
+        <div style={{ overflowY: 'auto', ...style }}> 
+                <table style={{ width: '100%' }}> 
                 <thead>
                     <tr>
-                        <th></th>
-                        <th>Country / Region / City</th>
-                        <th onClick={toggleSort}>
+                        <th style={{ width: `${columnWidths[0]}%`, textAlign: 'center' }}></th>
+                        <th style={{ width: `${columnWidths[1]}%`, textAlign: 'center' }}>Country / Region / City</th>
+                        <th style={{ width: `${columnWidths[2]}%`, textAlign: 'center' }} onClick={toggleSort}>
                             Event Count {sortAscending ? '▲' : '▼'}
-                        </th>
-
+                        </th> 
+                         
                     </tr>
                 </thead>
                 <tbody>
@@ -92,14 +102,14 @@ const EventTable: React.FC<TableProps> = ({ data }) => {
                                     <td onClick={() => toggleExpandCountry(country)}>
                                         {expandedCountries.has(country) ? '-' : '+'}
                                     </td>
-                                    <td>{country}</td>
-                                    <td>{countryCount}</td>
-                                </tr>
+                                    <td style={{ paddingLeft: '20px', textAlign: 'center' }}>{getValue(country)}</td>
+                                                    <td style={{ textAlign: 'center' }}>{countryCount}</td>
+                                                </tr>
                                 {expandedCountries.has(country) &&
                                     sortedRegions.map(([region, cities], regionIndex) => {
+                                        //  console.log('region', region,region.length)
                                         const regionKey = `${country}-${region}`;
                                         const regionCount = (cities as any[]).reduce((acc, cityData) => acc + Number(cityData.count), 0);
-
                                         const sortedCities = (cities as any[]).sort((cityA, cityB) => {
                                             const countA = Number(cityA.count);
                                             const countB = Number(cityB.count);
@@ -112,16 +122,16 @@ const EventTable: React.FC<TableProps> = ({ data }) => {
                                                     <td onClick={() => toggleExpandRegion(regionKey)}>
                                                         {expandedRegions.has(regionKey) ? '-' : '+'}
                                                     </td>
-                                                    <td style={{ paddingLeft: '20px' }}>{region}</td>
+                                                    <td style={{ paddingLeft: '20px' }}>{getValue(region)}</td>
                                                     <td>{regionCount}</td>
                                                 </tr>
                                                 {expandedRegions.has(regionKey) &&
                                                     sortedCities.map((cityData, cityIndex) => (
                                                         <tr key={cityIndex}>
-                                                            <td></td>
-                                                            <td style={{ paddingLeft: '40px' }}>{cityData.city}</td>
-                                                            <td>{cityData.count}</td>
-                                                        </tr>
+                                                        <td style={{ textAlign: 'center' }}></td>
+                                                        <td style={{ paddingLeft: '40px', textAlign: 'center' }}>{getValue(cityData.city)}</td>
+                                                        <td style={{ textAlign: 'center' }}>{cityData.count}</td>
+                                                    </tr>
                                                     ))}
                                             </React.Fragment>
                                         );
@@ -129,8 +139,8 @@ const EventTable: React.FC<TableProps> = ({ data }) => {
                             </React.Fragment>
                         );
                     })}
-
                 </tbody>
+
             </table>
         </div>
     );
