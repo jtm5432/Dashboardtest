@@ -1,13 +1,15 @@
 import React, { useEffect, useState } from 'react';
 import EventTable from './EventTable';
+interface ChartProps {
+    width?: number;
+    height?: number;
+}
 
-const EventTableApp: React.FC = () => {
+const EventTableApp:  React.FC<ChartProps> = ({ width = 600, height = 400 }) => {
   const [data, setData] = useState<(string | number)[][]>([]);
   const [loading, setLoading] = useState(true);
-  const [width, setWidth] = useState(window.innerWidth - 100); // Reduce 100px from window width
-  const [height, setHeight] = useState(window.innerHeight - 100); // Reduce 100px from window height
-
   useEffect(() => {
+
     fetch("https://static.adbrix.io/front/coding-test/event_4.json")
       .then(response => response.json())
       .then(data => {
@@ -19,25 +21,7 @@ const EventTableApp: React.FC = () => {
         setLoading(false);
       });
 
-    // Resize observer를 이용하여 EventTableApp의 크기 변화를 감지
-    const resizeObserver = new ResizeObserver((entries) => {
-      for (let entry of entries) {
-        setWidth(entry.contentRect.width - 100);
-        setHeight(entry.contentRect.height - 100);
-      }
-    });
-
-    const container = document.getElementById('eventTableAppContainer');
-    if (container) {
-      resizeObserver.observe(container);
-    }
-
-    // Cleanup function: observer를 중지
-    return () => {
-      if (container) {
-        resizeObserver.unobserve(container);
-      }
-    };
+    
   }, []);
 
   if (loading) {
@@ -45,8 +29,8 @@ const EventTableApp: React.FC = () => {
   }
 
   return (
-    <div id="eventTableAppContainer" style={{ width: `${width}px`, height: `${height}px` }}>
-      <EventTable data={data} style={{ width, height }} columnWidths={[10, 60, 30]} />
+    <div id="eventTableAppContainer">
+      <EventTable data={data}  columnWidths={[10, 60, 30]} />
     </div>
   );
 };

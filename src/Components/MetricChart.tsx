@@ -58,7 +58,7 @@ const SummaryComponent: React.FC<SummaryComponentProps> = ({ viewType }) => {
 
                     d3.select(ref.current)
                         .append('p')
-                        .html(` <span style="color: red;">&darr; ${viewDifference}</span>`);
+                        .html(` <span style="color: red;">&darr; - ${viewDifference}</span>`);
                 }
             }
         });

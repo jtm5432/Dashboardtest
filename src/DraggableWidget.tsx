@@ -23,7 +23,7 @@ const DraggableWidget: React.FC<DraggableWidgetProps> = ({
       ref={ref}
       w="100%"  // 너비 100%
       h="100%"  // 높이 100%
-      bg="lightgray"
+      bg="white"
       padding="20px"
       boxSizing="border-box"
     > 

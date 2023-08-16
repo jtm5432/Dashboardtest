@@ -26,19 +26,23 @@ const TrendChart: React.FC<ChartProps> = ({
     useEffect(() => {
         const resizeObserver = new ResizeObserver(() => {
             if (containerRef.current) {
-                setWidth(containerRef.current.offsetWidth);
-                setHeight(containerRef.current.offsetHeight);
+                const scrollbarWidth = 17; // 스크롤바 너비 감안
+                const newWidth = containerRef.current.offsetWidth - scrollbarWidth;
+                const newHeight = containerRef.current.offsetHeight - scrollbarWidth;
+                setWidth(newWidth);
+                setHeight(newHeight);
             }
         });
-
+    
         if (containerRef.current) {
             resizeObserver.observe(containerRef.current);
         }
-
+    
         return () => {
             resizeObserver.disconnect();
         };
     }, []);
+    
 
     useEffect(() => {
         if (ref.current) {
@@ -104,7 +108,33 @@ const TrendChart: React.FC<ChartProps> = ({
                 });
         }
     }, [width, height, margin]);
-
+    useEffect(() => {
+        const updateSize = () => {
+            if (containerRef.current) {
+                const scrollbarWidth = 17; // 스크롤바 너비 감안
+                const newWidth = containerRef.current.offsetWidth - scrollbarWidth;
+                const newHeight = containerRef.current.offsetHeight - scrollbarWidth;
+                setWidth(newWidth);
+                setHeight(newHeight);
+            }
+        };
+    
+        const resizeObserver = new ResizeObserver(() => {
+            updateSize();
+        });
+        
+        if (containerRef.current) {
+            resizeObserver.observe(containerRef.current);
+        }
+    
+        // 컴포넌트가 마운트될 때 크기를 업데이트
+        updateSize();
+    
+        return () => {
+            resizeObserver.disconnect();
+        };
+    }, []);
+    
     return (
         <div ref={containerRef} style={{ width: '100%', height: '100%' }}>
             <svg ref={ref} width={width} height={height}></svg>
