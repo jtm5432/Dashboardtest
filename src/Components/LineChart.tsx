@@ -15,7 +15,7 @@ interface ChartProps {
 }
 
 const TrendChart: React.FC<ChartProps> = ({
-    margin = { top: 20, right: 20, bottom: 50, left: 50 }
+    margin = { top: 20, right: 20, bottom: 60, left: 50 }
 }) => {
     const ref = useRef<SVGSVGElement | null>(null);
     const containerRef = useRef<HTMLDivElement | null>(null);
@@ -33,18 +33,21 @@ const TrendChart: React.FC<ChartProps> = ({
                 setHeight(newHeight);
             }
         });
-    
+
         if (containerRef.current) {
             resizeObserver.observe(containerRef.current);
         }
-    
+
         return () => {
             resizeObserver.disconnect();
         };
     }, []);
-    
+
 
     useEffect(() => {
+        if (width === 0 || height === 0) {
+            return;
+        }
         if (ref.current) {
             d3.json("https://static.adbrix.io/front/coding-test/event_1.json")
                 .then((response: any) => {
@@ -58,7 +61,7 @@ const TrendChart: React.FC<ChartProps> = ({
 
                     const xScale = d3.scaleTime()
                         .domain(d3.extent(data, d => d.date) as [Date, Date])
-                        .range([0, width - margin.left - margin.right]);
+                        .range([1, width - margin.left - margin.right - 5]);
 
                     const yScaleLine = d3.scaleLinear()
                         .domain([0, d3.max(data, d => d.unique_view) as number])
@@ -104,7 +107,30 @@ const TrendChart: React.FC<ChartProps> = ({
                         .attr("width", 5)
                         .attr("height", d => Math.max(0, height - margin.top - margin.bottom - (yScaleBar(d.page_view) as number)))
                         .attr("fill", "red");
+                    // Draw legend
+                    const legend = svg.append("g")
+                        .attr("transform", `translate(${ margin.left  + 100},${height - margin.bottom + 20})`);
 
+                    const categories = ['Unique View', 'Page View'];
+                    const colors = ['blue', 'red'];
+
+                    categories.forEach((category, i) => {
+                        const legendRow = legend.append('g')
+                            .attr('transform', `translate(${i * 120}, 0)`); // Increase spacing between legend items
+                    
+                        legendRow.append('rect')
+                            .attr('width', 10)
+                            .attr('height', 10)
+                            .attr('fill', colors[i]);
+                    
+                        legendRow.append('text')
+                            .attr('x', 20)
+                            .attr('y', 10)
+                            .attr('text-anchor', 'start')
+                            .style('text-transform', 'capitalize')
+                            .text(category);
+                    });
+                    
                 });
         }
     }, [width, height, margin]);
@@ -118,23 +144,23 @@ const TrendChart: React.FC<ChartProps> = ({
                 setHeight(newHeight);
             }
         };
-    
+
         const resizeObserver = new ResizeObserver(() => {
             updateSize();
         });
-        
+
         if (containerRef.current) {
             resizeObserver.observe(containerRef.current);
         }
-    
+
         // 컴포넌트가 마운트될 때 크기를 업데이트
         updateSize();
-    
+
         return () => {
             resizeObserver.disconnect();
         };
     }, []);
-    
+
     return (
         <div ref={containerRef} style={{ width: '100%', height: '100%' }}>
             <svg ref={ref} width={width} height={height}></svg>

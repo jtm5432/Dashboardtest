@@ -1,4 +1,4 @@
-import  { useEffect, useState, useRef } from 'react';
+import { useEffect, useState, useRef } from 'react';
 
 interface TableProps {
     data: (string | number)[][];
@@ -8,12 +8,6 @@ interface TableProps {
     height?: number;
 }
 
-const getValue = (value: any) => {
-    if (value === null || value === undefined || value.length === 0) {
-        return 'etc';
-    }
-    return value;
-};
 
 const EventTable: React.FC<TableProps> = ({ data, style, columnWidths, width, height }) => {
     const tableContainerRef = useRef(null);
@@ -28,7 +22,30 @@ const EventTable: React.FC<TableProps> = ({ data, style, columnWidths, width, he
         setTableHeight(height);
     }, [width, height]);
 
-
+    const getCountValue = (value:string) =>{
+        return addArrayLength(countryData[value]);
+     
+     }
+     const getValue = (value: any) => {
+         if (value === null || value === undefined || value.length === 0) {
+             return 'etc';
+         }
+         return value;
+     };
+         const addArrayLength = (value: any) => {
+           
+             if(typeof(value)==='object'){
+                console.log('addArrayLength',value,Array.isArray(value))
+                let counter = 0;
+                 for(let ii in value){
+                    if(typeof(value[ii])==='object')counter = counter+addArrayLength(value[ii]);
+                    else counter ++;
+                 }
+                 return counter;
+             }
+             else return 1;
+     
+         }
     const toggleSort = () => {
         setSortAscending(!sortAscending);
     };
@@ -54,6 +71,7 @@ const EventTable: React.FC<TableProps> = ({ data, style, columnWidths, width, he
     };
 
     const countryData = data.reduce((acc: any, item) => {
+        console.log('data',data)
         const country = getValue(item[0]) as string;
         const region = getValue(item[1]) as string;
         const city = getValue(item[2]) as string;
@@ -67,19 +85,19 @@ const EventTable: React.FC<TableProps> = ({ data, style, columnWidths, width, he
 
     const sortedCountryData = Object.entries(countryData).sort(([countryA, regionsA], [countryB, regionsB]) => {
         const countA = Object.values(regionsA as any).reduce(
-            (acc, cities: any) => acc + cities.reduce((cityAcc, cityData) => cityAcc + Number(cityData.count), 0), 
+            (acc, cities: any) => acc + cities.reduce((cityAcc, cityData) => cityAcc + Number(cityData.count), 0),
             0
         );
         const countB = Object.values(regionsB as any).reduce(
-            (acc, cities: any) => acc + cities.reduce((cityAcc, cityData) => cityAcc + Number(cityData.count), 0), 
+            (acc, cities: any) => acc + cities.reduce((cityAcc, cityData) => cityAcc + Number(cityData.count), 0),
             0
         );
         return sortAscending ? countA - countB : countB - countA;
     });
-    console.log('tableContainerRef',tableWidth,tableHeight)
+   // console.log('tableContainerRef', tableWidth, tableHeight)
     return (
         <div ref={tableContainerRef} style={{ overflow: 'auto', width: tableWidth, height: tableHeight }}>
-              <table style={{ width: '100%', tableLayout: 'fixed' }}>
+            <table style={{ width: '100%', tableLayout: 'fixed' }}>
                 <thead>
                     <tr>
                         <th style={{ width: `${columnWidths[0]}%`, textAlign: 'center' }}></th>
@@ -108,8 +126,8 @@ const EventTable: React.FC<TableProps> = ({ data, style, columnWidths, width, he
                                     <td onClick={() => toggleExpandCountry(country)}>
                                         {expandedCountries.has(country) ? '-' : '+'}
                                     </td>
-                                    <td style={{ paddingLeft: '20px', textAlign: 'center' }}>{getValue(country)}</td>
-                                    <td style={{ textAlign: 'center' }}>{countryCount}</td>
+                                    <td style={{ paddingLeft: '20px' }}>{getValue(country)}{getCountValue(country)}</td>
+                                    <td style={{ paddingLeft: '20px' }}>{countryCount}</td>
                                 </tr>
                                 {expandedCountries.has(country) &&
                                     sortedRegions.map(([region, cities], regionIndex) => {
@@ -127,15 +145,15 @@ const EventTable: React.FC<TableProps> = ({ data, style, columnWidths, width, he
                                                     <td onClick={() => toggleExpandRegion(regionKey)}>
                                                         {expandedRegions.has(regionKey) ? '-' : '+'}
                                                     </td>
-                                                    <td style={{ paddingLeft: '20px' }}>{getValue(region)}</td>
-                                                    <td>{regionCount}</td>
+                                                    <td style={{ paddingLeft: '40px' }}>{getValue(region)}</td>
+                                                    <td style={{ paddingLeft: '40px' }}>{regionCount}</td>
                                                 </tr>
                                                 {expandedRegions.has(regionKey) &&
                                                     sortedCities.map((cityData, cityIndex) => (
                                                         <tr key={cityIndex}>
-                                                            <td style={{ textAlign: 'center' }}></td>
-                                                            <td style={{ paddingLeft: '40px', textAlign: 'center' }}>{getValue(cityData.city)}</td>
-                                                            <td style={{ textAlign: 'center' }}>{cityData.count}</td>
+                                                            <td style={{ paddingLeft: '20px' }}></td>
+                                                            <td style={{ paddingLeft: '60px' }}>{getValue(cityData.city)}</td>
+                                                            <td style={{ paddingLeft: '60px' }}>{cityData.count}</td>
                                                         </tr>
                                                     ))}
                                             </React.Fragment>
@@ -151,4 +169,3 @@ const EventTable: React.FC<TableProps> = ({ data, style, columnWidths, width, he
 };
 
 export default EventTable;
-    

@@ -7,6 +7,7 @@ const type = 'DRAGGABLE_ITEM';
 interface DraggableWidgetProps {
   title: string; // title prop을 추가합니다.
   component: ReactNode; // 여기서 component라는 prop을 추가합니다.
+  
 }
 
 const DraggableWidget: React.FC<DraggableWidgetProps> = ({
@@ -27,10 +28,10 @@ const DraggableWidget: React.FC<DraggableWidgetProps> = ({
       padding="20px"
       boxSizing="border-box"
     > 
-      <div className="draggable-widget-title">
-        <h3>{title}</h3> {/* title prop의 값을 위젯의 제목으로 표시합니다. */}
+        <div className="draggable-widget-title" style={{ height: '50px' }}> {/* Adjust height here */}
+        <h3>{title}</h3>
       </div>
-      <div className="draggable-widget">
+      <div className="draggable-widget" style={{ height: 'calc(100% - 50px)' }}> {/* Adjust height here */}
         {component}
       </div>
     </Box>

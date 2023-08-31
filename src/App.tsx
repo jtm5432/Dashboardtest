@@ -17,18 +17,32 @@ const ResponsiveGridLayout = WidthProvider(Responsive);
 const App: React.FC = () => {
   const [layout, setLayout] = useState<Layout[]>(loadFromSessionStorage() || []);
 
-  const layouts = layout ? {lg:layout}:{
+  const layouts = layout ? {lg:layout,md:layout,sm:layout}:{
     lg: [
       { i: 'a', x: 0, y: 0, w: 6, h: 2 },
       { i: 'b', x: 6, y: 0, w: 6, h: 2 },
       { i: 'c', x: 0, y: 2, w: 12, h: 2 },
       { i: 'd', x: 0, y: 4, w: 6, h: 2 },
       { i: 'e', x: 6, y: 4, w: 6, h: 2 },
+    ],
+    md: [
+      { i: 'a', x: 0, y: 0, w: 5, h: 2 },
+      { i: 'b', x: 6, y: 0, w: 5, h: 2 },
+      { i: 'c', x: 0, y: 2, w: 10, h: 2 },
+      { i: 'd', x: 0, y: 4, w: 5, h: 2 },
+      { i: 'e', x: 6, y: 4, w: 5, h: 2 },
+    ],
+    sm: [
+      { i: 'a', x: 0, y: 0, w: 2, h: 2 },
+      { i: 'b', x: 6, y: 0, w: 2, h: 2 },
+      { i: 'c', x: 0, y: 2, w: 4, h: 2 },
+      { i: 'd', x: 0, y: 4, w: 2, h: 2 },
+      { i: 'e', x: 6, y: 4, w: 2, h: 2 },
+
     ]
   };
   const gridBoxStyle = {
     backgroundColor: "white",
-    padding: "20px",
     border: "1px solid blue",
     boxShadow: "0 4px 8px 0 rgba(0, 0, 0, 0.2)",  // added shadow for a more "card-like" appearance
     borderRadius: "8px",  // added border radius for rounded corners
@@ -40,7 +54,7 @@ const App: React.FC = () => {
     }
   }, []);
   useEffect(() => {
-    saveToSessionStorage(layout);
+    saveToSessionStorage(layout)  ;
   }, [layout]);
   
   function saveToSessionStorage(layout: Layout[]) {
@@ -64,9 +78,13 @@ const App: React.FC = () => {
             setLayout(newLayout);
             saveToSessionStorage(newLayout);
           }}
+          onDragStop={(layout: Layout[]) => {
+            setLayout(layout);
+            saveToSessionStorage(layout);
+          }}
         >
           <div key="a" style={gridBoxStyle}>
-            <DraggableWidget title="접속 유저" component={<SummaryComponent viewType="unique_view" />} />
+           <DraggableWidget title="접속 유저" component={<SummaryComponent viewType="unique_view" />} />
 
           </div>
           <div key="b" style={gridBoxStyle}>

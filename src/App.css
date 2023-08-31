@@ -40,6 +40,27 @@ body {
 .metric-container {
   overflow-y: auto;
 }
+.legend-container {
+  display: flex;
+  align-items: center;
+}
+.legend-item {
+  display: flex;
+  align-items: center;
+}
+.legend-color {
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  margin-right: 5px;
+}
+
+button {
+  background-color: #f0f0f0;
+  border: none;
+  padding: 10px;
+  cursor: pointer;
+}
 
 
 .App-header {
@@ -93,6 +114,25 @@ body {
       #fff 1px,
       #fff 100%
     );
+}
+.layout {
+  background: rgba(0, 0, 0, 0.1);
+}
+
+.layout::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-image:
+    linear-gradient(0deg, transparent 24px, rgba(0, 0, 0, 0.1) 25px, transparent 26px),
+    linear-gradient(90deg, transparent 24px, rgba(0, 0, 0, 0.1) 25px, transparent 26px);
+  background-size: 50px 50px;
+  z-index: -1;
 }
 
 .react-resizable-handle  {
