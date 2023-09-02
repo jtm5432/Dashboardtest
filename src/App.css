@@ -98,23 +98,7 @@ button {
   height: 90%;
   overflow-y:auto;
 }
-/* Grid line 보이기 */
-.react-grid-layout .react-draggable-dragging {
-  background: repeating-linear-gradient(
-      0deg,
-      #ddd,
-      #ddd 1px,
-      #fff 1px,
-      #fff 100%
-    ),
-    repeating-linear-gradient(
-      -90deg,
-      #ddd,
-      #ddd 1px,
-      #fff 1px,
-      #fff 100%
-    );
-}
+
 .layout {
   background: rgba(0, 0, 0, 0.1);
 }
@@ -128,10 +112,10 @@ button {
   left: 0;
   width: 100%;
   height: 100%;
-  background-image:
+  /* background-image:
     linear-gradient(0deg, transparent 24px, rgba(0, 0, 0, 0.1) 25px, transparent 26px),
     linear-gradient(90deg, transparent 24px, rgba(0, 0, 0, 0.1) 25px, transparent 26px);
-  background-size: 50px 50px;
+  background-size: 50px 50px; */
   z-index: -1;
 }
 
