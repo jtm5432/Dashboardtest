@@ -1,6 +1,15 @@
 import { useEffect, useState, useRef } from 'react';
 import { useMemo, Fragment } from 'react';
 import React from 'react';
+/**
+ * @typedef TableProps
+ * @property {Array<Array<string | number>>} data - 테이블 데이터.
+ * @property {React.CSSProperties} [style] - (optional) 컴포넌트의 스타일.
+ * @property {Array<number>} [columnWidths] - (optional) 각 칼럼의 너비.
+ * @property {number} [width] - (optional) 테이블의 너비.
+ * @property {number} [height] - (optional) 테이블의 높이.
+ */
+
 interface TableProps {
     data: (string | number)[][];
     style?: React.CSSProperties;
@@ -25,24 +34,35 @@ const EventTable: React.FC<TableProps> = ({ data, style, columnWidths, width, he
         setTableWidth(width);
         setTableHeight(height);
     }, [width, height]);
+
     /**
-     * 
-     * @param country 국가index
-     * @param region 지역 index
-     * @param city 시 index
-     * @returns 
+     * 국가, 지역, 도시 인덱스를 통해 카운트 값을 가져옵니다.
+     * @param {string} country 국가 인덱스
+     * @param {string} region 지역 인덱스
+     * @param {string} city 도시 인덱스
+     * @returns {number}
      */
     const getCountValue = (country: string, region: string, city: string) => {
         if (country && region && city) return addArrayLength(countryData[country][region][city]);
         else if (country && region) return addArrayLength(countryData[country][region]);
         else return addArrayLength(countryData[country]);
     }
+    /**
+ * 지정된 값이 없거나 길이가 0이면 'etc'를 반환하고, 그렇지 않으면 값을 반환합니다.
+ * @param {*} value
+ * @returns {string}
+ */
     const getValue = (value: any) => {
         if (value === null || value === undefined || value.length === 0) {
             return 'etc';
         }
         return value;
     };
+    /**
+ * 지정된 값이 없거나 길이가 0이면 'etc'를 반환하고, 그렇지 않으면 값을 반환합니다.
+ * @param {*} value
+ * @returns {string}
+ */
     const addArrayLength = (value: any) => {
 
         if (typeof (value) === 'object') {
@@ -58,6 +78,9 @@ const EventTable: React.FC<TableProps> = ({ data, style, columnWidths, width, he
         else return 1;
 
     }
+    /**
+ * 정렬 순서를 전환합니다.
+ */
     const toggleSort = () => {
         setSortAscending(!sortAscending);
         setSortCriterion('sortAscending');
@@ -65,12 +88,18 @@ const EventTable: React.FC<TableProps> = ({ data, style, columnWidths, width, he
 
     };
 
+    /**
+     * 정렬 핸들러.
+     */
     const handleSort = () => {
         setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc');
         setSortCriterion('sortOrder');
 
     };
-
+    /**
+      * 지정된 국가의 확장 상태를 전환합니다.
+      * @param {string} country
+      */
     const toggleExpandCountry = (country: string) => {
         const newExpandedCountries = new Set(expandedCountries);
         if (newExpandedCountries.has(country)) {
@@ -81,6 +110,10 @@ const EventTable: React.FC<TableProps> = ({ data, style, columnWidths, width, he
         setExpandedCountries(newExpandedCountries);
     };
 
+    /**
+     * 지정된 지역의 확장 상태를 전환합니다.
+     * @param {string} regionKey
+     */
     const toggleExpandRegion = (regionKey: string) => {
         const newExpandedRegions = new Set(expandedRegions);
         if (newExpandedRegions.has(regionKey)) {
@@ -90,8 +123,11 @@ const EventTable: React.FC<TableProps> = ({ data, style, columnWidths, width, he
         }
         setExpandedRegions(newExpandedRegions);
     };
-
-    const countryData = data.reduce((acc: any, item) => {
+    /**
+       * countryData 객체를 생성합니다. 
+       * 이 객체는 국가, 지역, 도시별로 그룹화된 데이터를 포함합니다.
+       */
+    const countryData = data?.reduce((acc: any, item) => {
         console.log('drawData')
         const country = getValue(item[0]) as string;
         const region = getValue(item[1]) as string;
@@ -103,7 +139,12 @@ const EventTable: React.FC<TableProps> = ({ data, style, columnWidths, width, he
         acc[country][region].push({ city, count });
         return acc;
     }, {});
+    /**
+  * sortedCountryData 객체를 생성합니다.
+  * 이 객체는 countryData 객체를 정렬된 순서로 포함합니다.
+  */
     const sortedCountryData = useMemo(() => {
+        if (!countryData) return [];
         return Object.entries(countryData).sort(([countryA, regionsA], [countryB, regionsB]) => {
             const countA = Object.values(regionsA as string).reduce(
                 (acc, cities: any) => acc + cities.reduce((cityAcc: number, cityData: { count: number }) => cityAcc + Number(cityData.count), 0),
@@ -148,11 +189,11 @@ const EventTable: React.FC<TableProps> = ({ data, style, columnWidths, width, he
                     {
                         sortedCountryData.map(([country, regions]: [string, unknown], countryIndex: number) => {
                             regions = regions as Record<string, { city: string, count: number }>;
-                            console.log('regions',regions)
-                            let  countryCount;
+                            console.log('regions', regions)
+                            let countryCount;
                             let sortedRegions;
                             if (typeof regions === 'object' && regions !== null) {
-                                 countryCount = Object.values(regions ).reduce(
+                                countryCount = Object.values(regions).reduce(
                                     (acc, cities: any) => acc + cities.reduce((cityAcc: number, cityData: any) => cityAcc + Number(cityData.count), 0),
                                     0
                                 );
@@ -163,7 +204,7 @@ const EventTable: React.FC<TableProps> = ({ data, style, columnWidths, width, he
                                     // console.log('sortOrder',sortOrder)
                                     return sortOrder === 'asc' ? countA - countB : countB - countA;
                                 });
-                           }
+                            }
 
                             return (
                                 <Fragment key={countryIndex}>

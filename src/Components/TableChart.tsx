@@ -18,6 +18,7 @@ const EventTableApp:  React.FC<ChartProps> = ({ width = 600, height = 400 }) => 
       })
       .catch(error => {
         console.error("Error fetching data: ", error);
+        setData([]);
         setLoading(false);
       });
 

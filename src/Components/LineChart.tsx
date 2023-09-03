@@ -2,18 +2,36 @@ import React, { useEffect, useRef, useState } from 'react';
 import * as d3 from 'd3';
 import { transformRawDataToDataSet } from './DataController';
 
+
+/**
+ * @typedef DataPoint
+ * @property {Date} date - 날짜.
+ * @property {number} unique_view - 유니크 뷰.
+ * @property {number} page_view - 페이지 뷰.
+ */
 interface DataPoint {
     date: Date;
     unique_view: number;
     page_view: number;
 }
 
+/**
+ * @typedef DataSet
+ * @type {Array<DataPoint>}
+ */
 type DataSet = DataPoint[];
+/**
+ * @typedef ChartProps
+ * @property {{ top: number, right: number, bottom: number, left: number }} [margin] - (optional) 차트의 마진.
+ */
 
 interface ChartProps {
     margin?: { top: number, right: number, bottom: number, left: number };
 }
-
+/**
+ * 선과 막대로 데이터를 시각화하는 차트 컴포넌트.
+ * @param {ChartProps} param0
+ */
 const TrendChart: React.FC<ChartProps> = ({
     margin = { top: 20, right: 20, bottom: 60, left: 50 }
 }) => {
@@ -116,7 +134,7 @@ const TrendChart: React.FC<ChartProps> = ({
 
                     categories.forEach((category, i) => {
                         const legendRow = legend.append('g')
-                            .attr('transform', `translate(${i * 120}, 0)`); // Increase spacing between legend items
+                            .attr('transform', `translate(${i * 120}, 0)`);
                     
                         legendRow.append('rect')
                             .attr('width', 10)

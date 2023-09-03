@@ -1,17 +1,37 @@
 import React, { useEffect, useRef, useState } from 'react';
 import * as d3 from 'd3';
 
+
+/**
+ * @typedef {Object} PieChartData
+ * @property {string} referrer - 리페러 이름.
+ * @property {number} users - 사용자 수.
+ * @property {string} [color] - 선택적 색상 속성.
+ */
+
 interface PieChartData {
     referrer: string;
     users: number;
     color?: string; // optional color property
 }
 
+/**
+ * @typedef {Object} ChartProps
+ * @property {number} [width] - 차트의 너비.
+ * @property {number} [height] - 차트의 높이.
+ */
+
 interface ChartProps {
     width?: number;
     height?: number;
 }
 
+/**
+ * PieChart는 차트의 너비와 높이를 props로 받아 파이 차트를 그리는 컴포넌트입니다.
+ * 
+ * @component
+ * @param {ChartProps} props
+ */
 const PieChart: React.FC<ChartProps> = ({ width = 600, height = 400 }) => {
     const ref = useRef<SVGSVGElement | null>(null);
     const [chartWidth, setChartWidth] = useState(width);
@@ -25,7 +45,7 @@ const PieChart: React.FC<ChartProps> = ({ width = 600, height = 400 }) => {
     const [maxItemsInView, setMaxItemsInView] = useState(6);//최대 legend 개수
     const drawChart = () => {
         if (ref.current) {
-            d3.select(ref.current).selectAll("*").remove(); // Clear existing chart elements
+            d3.select(ref.current).selectAll("*").remove(); //차트를 새로 생성하기전에 기존차트를 지워줘야한다.
 
             d3.json("https://static.adbrix.io/front/coding-test/event_3.json")
                 .then((response: any) => {
